@@ -10,7 +10,7 @@ COPY ./src/judge.cpp .
 RUN g++ -O2 -o judge judge.cpp
 RUN git clone https://github.com/atcoder/ac-library
 
-COPY ./compile.sh .
+COPY ./src/compile.sh .
 RUN chmod 777 ./compile.sh
 
 ENTRYPOINT ["/bin/sh","-c","while :; do sleep 10;done"]

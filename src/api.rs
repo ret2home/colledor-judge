@@ -22,6 +22,9 @@ pub mod api {
             .args(vec![
                 "run".to_string(),
                 "-d".to_string(),
+                "-m".to_string(),
+                "2g".to_string(),
+                "--cpus=1".to_string(),
                 "--name".to_string(),
                 container_id.clone(),
                 "colledor-judge".to_string(),
@@ -83,6 +86,7 @@ pub mod api {
             .output()
             .unwrap();
 
+        println!("START: {}",data.id);
         return HttpResponse::Ok().json({});
     }
 
@@ -104,9 +108,14 @@ pub mod api {
             output: String,
         }
         let res = JudgeInfo {
-            output: fs::read_to_string(op_path.clone()).unwrap(),
+            output: match fs::read_to_string(op_path.clone()){
+                Err(err)=> "".to_string(),
+                Ok(t) => {
+                    fs::remove_file(op_path.clone()).unwrap();
+                    t
+                }
+            }
         };
-        fs::remove_file(op_path.clone()).unwrap();
         return HttpResponse::Ok().json(res);
     }
     #[get("/judge-kill/{id}")]
@@ -120,6 +129,7 @@ pub mod api {
             ])
             .output()
             .unwrap();
+        println!("END: {}",id);
         return HttpResponse::Ok().json({});
     }
 }

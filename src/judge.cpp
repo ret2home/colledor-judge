@@ -134,8 +134,7 @@ struct Game {
         } else if (act.type == 1) {
             if (act.x < 0 || act.x > 7 || act.y < 0 || act.y > 7) return false;
             if (wall_used[turn] == MAX_WALL) return false;
-            if (wall_hrz[act.x][act.y] || wall_hrz[act.x][act.y + 1] ||
-                wall_vert[act.x][act.y])
+            if (wall_hrz[act.x][act.y] || wall_hrz[act.x][act.y + 1])
                 return false;
             wall_hrz[act.x][act.y] = wall_hrz[act.x][act.y + 1] = true;
             bool res = isConnected();
@@ -144,8 +143,7 @@ struct Game {
         } else if (act.type == 2) {
             if (act.x < 0 || act.x > 7 || act.y < 0 || act.y > 7) return false;
             if (wall_used[turn] == MAX_WALL) return false;
-            if (wall_vert[act.x][act.y] || wall_vert[act.x + 1][act.y] ||
-                wall_hrz[act.x][act.y])
+            if (wall_vert[act.x][act.y] || wall_vert[act.x + 1][act.y])
                 return false;
             wall_vert[act.x][act.y] = wall_vert[act.x + 1][act.y] = true;
             bool res = isConnected();
@@ -245,7 +243,7 @@ Game generate_case() {
         if (4 < i)
             game.C[i][j] = game.C[8 - i][j];
         else if (!(i == 0 && j == 4) && !(i == 8 && j == 4) &&
-                 engine() % 3 != 0) {
+                 engine() % 2 != 0) {
             game.C[i][j] = true;
         } else {
             game.C[i][j] = false;
@@ -285,10 +283,8 @@ string interaction() {
         ss >> act.type;
         if (act.type == 0) {
             ss >> act.x;
-        } else if (act.type == 1 || act.type == 2) {
-            ss >> act.x >> act.y;
         } else {
-            return "WA_"+to_string(game.turn);
+            ss >> act.x >> act.y;
         }
 
         tim[game.turn] +=
@@ -296,11 +292,16 @@ string interaction() {
                                     chrono::system_clock::now() - clk)
                                     .count() /
                                 1000000.0);
-        if (tim[game.turn] > 75) return "TLE_"+to_string(game.turn);
+        if (tim[game.turn] > 75) {
+            if(!game.turn)return "TLE -";
+            else return "- TLE";
+        }
 
-        if (!game.applyAct(act)) return "WA_"+to_string(game.turn);
+        if (!game.applyAct(act)) {
+            if(!game.turn)return "WA -";
+            else return "- WA";
+        }
         //game.printBoard();
-        if (game.is_finished) break;
         if (act.type == 0) {
             ofs << _ << " " << 0 << " " << act.x << endl;
             reactive_write(__reactive_input[game.turn],
@@ -311,6 +312,7 @@ string interaction() {
                            to_string(act.type) + " " + to_string(act.x) + " " +
                                to_string(act.y) + "\n");
         }
+        if (game.is_finished) break;
         clk = chrono::system_clock::now();
     }
     return to_string(game.score[0])+" "+to_string(game.score[1]);
