@@ -243,7 +243,7 @@ Game generate_case() {
         if (4 < i)
             game.C[i][j] = game.C[8 - i][j];
         else if (!(i == 0 && j == 4) && !(i == 8 && j == 4) &&
-                 engine() % 2 != 0) {
+                 engine() % 5 < 3) {
             game.C[i][j] = true;
         } else {
             game.C[i][j] = false;
