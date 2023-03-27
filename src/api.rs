@@ -31,6 +31,8 @@ pub mod api {
             ])
             .output()
             .unwrap();
+        
+        println!("Hello");
 
         let src0_path: String = format!("./tmp/{}_0.cpp", data.id);
         let src1_path: String = format!("./tmp/{}_1.cpp", data.id);
@@ -40,12 +42,30 @@ pub mod api {
         let mut f = File::create(&Path::new(&src1_path)).unwrap();
         f.write_all(data.user2_source.clone().as_bytes()).unwrap();
 
+        Command::new("gsed")
+            .args(vec![
+                "-i".to_string(),
+                "s/PlayerXXX/Player1/".to_string(),
+                src0_path.clone()
+            ])
+            .output()
+            .unwrap();
+        
+        Command::new("gsed")
+            .args(vec![
+                "-i".to_string(),
+                "s/PlayerXXX/Player2/".to_string(),
+                src1_path.clone()
+            ])
+            .output()
+            .unwrap();
+
         Command::new("docker")
             .args(vec![
                 "cp".to_string(),
                 src0_path.clone(),
                 format!(
-                    "{}:/judgedir/ac-library/atcoder/player0.cpp",
+                    "{}:/judgedir/ac-library/atcoder/player1.cpp",
                     container_id.clone()
                 ),
             ])
@@ -56,32 +76,24 @@ pub mod api {
                 "cp".to_string(),
                 src1_path.clone(),
                 format!(
-                    "{}:/judgedir/ac-library/atcoder/player1.cpp",
+                    "{}:/judgedir/ac-library/atcoder/player2.cpp",
                     container_id.clone()
                 ),
             ])
             .output()
             .unwrap();
 
-        fs::remove_file(src0_path.clone()).unwrap();
-        fs::remove_file(src1_path.clone()).unwrap();
+        //fs::remove_file(src0_path.clone()).unwrap();
+        //fs::remove_file(src1_path.clone()).unwrap();
 
-        Command::new("docker")
-            .args(vec![
-                "exec".to_string(),
-                container_id.clone(),
-                "bash".to_string(),
-                "-c".to_string(),
-                "./compile.sh".to_string(),
-            ])
-            .output()
-            .unwrap();
         Command::new("docker")
             .args(vec![
                 "exec".to_string(),
                 "-d".to_string(),
                 container_id.clone(),
-                "./judge".to_string(),
+                "bash".to_string(),
+                "-c".to_string(),
+                "./compile.sh".to_string(),
             ])
             .output()
             .unwrap();
@@ -97,7 +109,7 @@ pub mod api {
         Command::new("docker")
             .args(vec![
                 "cp".to_string(),
-                format!("{}:/judgedir/judge_output.txt", container_id.clone()),
+                format!("{}:/judgedir/judge_opt.txt", container_id.clone()),
                 op_path.clone(),
             ])
             .output()
