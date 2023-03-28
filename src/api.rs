@@ -42,7 +42,7 @@ pub mod api {
         let mut f = File::create(&Path::new(&src1_path)).unwrap();
         f.write_all(data.user2_source.clone().as_bytes()).unwrap();
 
-        Command::new("gsed")
+        Command::new("sed")
             .args(vec![
                 "-i".to_string(),
                 "s/PlayerXXX/Player1/".to_string(),
@@ -51,7 +51,7 @@ pub mod api {
             .output()
             .unwrap();
         
-        Command::new("gsed")
+        Command::new("sed")
             .args(vec![
                 "-i".to_string(),
                 "s/PlayerXXX/Player2/".to_string(),
